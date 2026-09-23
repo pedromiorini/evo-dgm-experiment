@@ -12,7 +12,24 @@ A preparação inicial da F3 foi implementada localmente e publicada, sem rede, 
 | MockLLM | Implementado | Cenários determinísticos, não representa desempenho de LLM real |
 | Cenários adversariais | Implementado | Inclui mutação inválida, regressão, injection histórica, resposta malformada e falsa aprovação |
 | Validação de tarefas | Implementado | Contrato exige referência, nulo, adversarial, metamórfico e hardcoding |
-| Genome0/loop | Não implementado | Depende da conclusão dos controles de sandbox/evaluator |
+| Pipeline dry-run | Implementado | Orquestra manifesto, tarefa, gateway, cassette, orçamento, proposta e lineage sem executar genoma |
+| Genome0/loop real | Não implementado | Depende da conclusão dos controles de sandbox/evaluator |
+
+## Fluxo validado no dry-run
+
+```text
+manifesto congelado
+  -> tarefa validada
+  -> histórico marcado UNTRUSTED_DATA
+  -> MockLLM determinístico
+  -> gateway estruturado e orçamento
+  -> cassette verificável
+  -> proposta validada por allowlist
+  -> lineage com hash
+  -> resultado NOT_EXECUTED / INSUFFICIENT_EVIDENCE
+```
+
+Os cenários de resposta malformada e histórico adversarial são registrados sem promoção. Mesmo uma proposta estruturalmente aceita não é executada nem tratada como evidência funcional: o dry-run valida apenas a engenharia do pipeline.
 
 ## Critério de interpretação
 
