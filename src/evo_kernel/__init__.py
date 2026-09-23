@@ -7,7 +7,11 @@ backend de sandbox verificado e aprovado.
 from .budget import Budget, BudgetExceeded
 from .history import HistoricalRecord, build_prompt_context
 from .integrity import HashChain, canonical_json, sha256_file
+from .manifest import FrozenManifest, ManifestError
+from .permissions import MutationProposal, PermissionDenied
+from .provenance import LineageRecord, ProvenanceError
 from .sandbox import IsolationStatus, SandboxUnavailable, verify_docker_isolation
+from .validity import CandidateValidity, PromotionDenied, ValidityState
 
 __all__ = [
     "Budget",
@@ -17,7 +21,16 @@ __all__ = [
     "HashChain",
     "canonical_json",
     "sha256_file",
+    "FrozenManifest",
+    "ManifestError",
+    "MutationProposal",
+    "PermissionDenied",
+    "LineageRecord",
+    "ProvenanceError",
     "IsolationStatus",
     "SandboxUnavailable",
     "verify_docker_isolation",
+    "CandidateValidity",
+    "PromotionDenied",
+    "ValidityState",
 ]
