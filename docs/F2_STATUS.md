@@ -16,9 +16,12 @@ A F2 está parcialmente implementada em modo exploratório, sem execução de ge
 | Allowlist de mutações | Implementado | `src/evo_kernel/permissions.py` |
 | Estados de validade | Implementado | `src/evo_kernel/validity.py` |
 | Proveniência de lineage | Implementado | `src/evo_kernel/provenance.py` |
+| Gateway LLM kernel-only | Contrato implementado | `src/evo_kernel/gateway.py`; sem chamada externa |
+| Evaluator separado | Contrato implementado | `src/evo_kernel/evaluator.py`; raízes e transporte separados |
+| Perfil Docker restritivo | Declarativo | `src/evo_kernel/docker_profile.py`; não executa containers |
 
 ## O que ainda bloqueia a conclusão da F2
 
-Ainda é necessário validar um runtime real com Docker rootless, `no-new-privileges`, seccomp, capabilities mínimas, rede negada, filesystem descartável e limites de CPU/RAM/processos/tempo. Também falta implementar o evaluator isolado, o gateway estruturado e os ataques de sandbox que só podem ser executados em ambiente apropriado.
+Ainda é necessário validar um runtime real com Docker rootless, `no-new-privileges`, seccomp, capabilities mínimas, rede negada, filesystem descartável e limites de CPU/RAM/processos/tempo. Também falta executar o evaluator isolado, validar o gateway contra um provider real ou cassette aprovado e executar os ataques de sandbox que só podem ser realizados em ambiente apropriado.
 
-A presença desses módulos não constitui prova de segurança. A ausência de falhas observadas significa somente que os testes executados no ambiente atual não demonstraram a vulnerabilidade correspondente.
+Os contratos atuais são deliberadamente não executores: não fazem chamadas de rede, não iniciam containers e não executam código de candidato. A presença desses módulos não constitui prova de segurança. A ausência de falhas observadas significa somente que os testes executados no ambiente atual não demonstraram a vulnerabilidade correspondente.
