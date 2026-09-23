@@ -2,39 +2,36 @@
 
 Projeto experimental inspirado na Darwin Gödel Machine para investigar, sob protocolo auditável, se a auto-modificação evolutiva produz melhoria funcional generalizável sem regressão crítica de segurança, validade ou custo.
 
-> **Estado atual: `NOT_STARTED` — Fase F1 (protocolo e decisões humanas).**
+> **Estado atual: `IN_PROGRESS` — F2 em preparação, com execução de genoma bloqueada (`FAIL_CLOSED`).**
 >
-> O kernel experimental ainda **não deve ser implementado**. A especificação exige que as decisões metodológicas, de segurança e de governança sejam explicitadas e aprovadas antes da implementação.
+> A F1 foi resolvida em modo `EXPLORATORY`. O ambiente atual não possui Docker (`docker: command not found`), portanto nenhum genoma pode ser executado até que um runtime de sandbox seja instalado e validado.
 
 ## Documentos principais
 
 - [Especificação completa](docs/SPEC.md)
 - [Modelo de ameaças](docs/THREAT_MODEL.md)
-- [Decisões humanas pendentes](protocol/DECISOES_HUMANAS.md)
+- [Decisões humanas registradas](protocol/DECISOES_HUMANAS.md)
 - [Arquitetura e fronteiras de confiança](protocol/ARQUITETURA.md)
-- [Plano de protocolo F1](protocol/PLANO_F1.md)
+- [Plano da F1](protocol/PLANO_F1.md)
+
+## F2 implementada nesta etapa
+
+A primeira camada de controles confiáveis foi adicionada sem executar genomas: cadeia de hashes para logs tamper-evident, contador de orçamento fail-closed, contexto histórico estruturalmente separado como `UNTRUSTED_DATA` e pré-voo de disponibilidade do Docker. Testes adversariais básicos cobrem adulteração de histórico, excedente de orçamento, adulteração de logs e ausência de sandbox.
+
+A verificação de disponibilidade ainda não é prova de isolamento. Quando Docker estiver disponível, será necessário validar em runtime rootless/user namespace, `no-new-privileges`, seccomp, capabilities mínimas, rede negada e filesystem descartável antes de habilitar execução.
 
 ## Princípios operacionais
 
-1. O kernel é confiável e o genoma é não confiável.
-2. Segurança é implementada por código, permissões e ambiente; prompt não é boundary.
-3. Holdout, evaluator, seleção, orçamento, manifesto e logs oficiais permanecem sob controle do kernel.
-4. Conteúdo histórico entre gerações é sempre `UNTRUSTED_DATA`, nunca instrução.
-5. O sistema falha fechado quando uma propriedade crítica não puder ser verificada.
-6. `INSUFFICIENT_EVIDENCE` é um resultado válido.
-7. O projeto não faz alegações sobre consciência, experiência subjetiva, identidade, vida ou agência psicológica.
+O kernel é confiável e o genoma é não confiável. Segurança é implementada por código, permissões e ambiente; prompt não é boundary. Holdout, evaluator, seleção, orçamento, manifesto e logs oficiais permanecem sob controle do kernel. Conteúdo histórico entre gerações é sempre `UNTRUSTED_DATA`, nunca instrução. O sistema falha fechado quando uma propriedade crítica não puder ser verificada. `INSUFFICIENT_EVIDENCE` é um resultado válido.
+
+O projeto não faz alegações sobre consciência, experiência subjetiva, identidade, vida ou agência psicológica.
 
 ## Desenvolvimento
 
-O projeto será implementado em Python 3.12+ quando a F1 for concluída e as decisões humanas necessárias forem registradas em `pending_approval/`. Até lá, alterações devem ser limitadas à documentação, ao protocolo e aos artefatos de revisão.
+Requisitos: Python 3.12+. Para validar os controles locais:
 
 ```bash
-python3 --version
-git status
+python3 -m pytest
 ```
 
-Não execute um experimento confirmatório a partir deste repositório enquanto o estado global não tiver sido alterado por decisão humana documentada.
-
-## Licença
-
-A licença ainda não foi escolhida. Essa é uma das decisões de governança a registrar antes da publicação pública.
+Não execute um experimento confirmatório a partir deste repositório. A rodada atual é exploratória, com B3 como braço principal e B0 apenas como referência opcional.
