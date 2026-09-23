@@ -2,7 +2,7 @@
 
 Projeto experimental inspirado na Darwin Gödel Machine para investigar, sob protocolo auditável, se a auto-modificação evolutiva produz melhoria funcional generalizável sem regressão crítica de segurança, validade ou custo.
 
-> **Estado atual: `IN_PROGRESS` — F2 parcial e preparação F3, com execução de genoma bloqueada (`FAIL_CLOSED`).**
+> **Estado atual: `IN_PROGRESS` — F2 parcial, F3 preparada e F4 dry-run concluída, com execução de genoma bloqueada (`FAIL_CLOSED`).**
 >
 > A F1 foi resolvida em modo `EXPLORATORY`. O ambiente atual não possui Docker (`docker: command not found`), portanto nenhum genoma pode ser executado até que um runtime de sandbox seja instalado e validado.
 
@@ -12,12 +12,13 @@ Projeto experimental inspirado na Darwin Gödel Machine para investigar, sob pro
 - [Modelo de ameaças](docs/THREAT_MODEL.md)
 - [Status detalhado da F2](docs/F2_STATUS.md)
 - [Status da F3](docs/F3_STATUS.md)
+- [Status da F4](docs/F4_STATUS.md)
 - [Decisões humanas registradas](protocol/DECISOES_HUMANAS.md)
 - [Arquitetura e fronteiras de confiança](protocol/ARQUITETURA.md)
 
 ## Controles e preparação implementados
 
-A base confiável inclui cadeia de hashes para logs tamper-evident, contador de orçamento, contexto histórico separado como `UNTRUSTED_DATA`, manifesto congelado, allowlist de mutações, estados de validade, proveniência de lineage, gateway LLM estruturado, contrato de evaluator separado e perfil Docker declarativo. A preparação da F3 adiciona cassettes íntegros, MockLLM determinístico com cenários adversariais e contrato de validação discriminativa de tarefas.
+A base confiável inclui cadeia de hashes para logs tamper-evident, contador de orçamento, contexto histórico separado como `UNTRUSTED_DATA`, manifesto congelado, allowlist de mutações, estados de validade, proveniência de lineage, gateway LLM estruturado, contrato de evaluator separado e perfil Docker declarativo. A preparação da F3 adiciona cassettes íntegros, MockLLM determinístico, validação discriminativa de tarefas e um pipeline dry-run. A F4 valida três gerações B3 como sequência de contratos, sem executar candidatos.
 
 Esses componentes não fazem chamadas externas nem executam genomas. Quando Docker estiver disponível, será necessário validar em runtime rootless/user namespace, `no-new-privileges`, seccomp, capabilities mínimas, rede negada e filesystem descartável antes de habilitar execução.
 

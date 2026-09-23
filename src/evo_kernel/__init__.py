@@ -9,6 +9,7 @@ from .cassette import Cassette, CassetteError
 from .docker_profile import DockerProfileError, DockerSandboxProfile
 from .dry_run import DryRunPipeline, DryRunReport
 from .evaluator import EvaluatorBoundary, EvaluatorBoundaryError, EvaluationResult, TaskSpec, TaskValidity
+from .exploratory import ExploratoryRun, ExploratoryRunSummary
 from .gateway import GatewayDenied, GatewayExchange, GatewayPolicy
 from .history import HistoricalRecord, build_prompt_context
 from .integrity import HashChain, canonical_json, sha256_file
@@ -24,7 +25,7 @@ __all__ = [
     "Budget", "BudgetExceeded", "Cassette", "CassetteError",
     "DockerProfileError", "DockerSandboxProfile", "DryRunPipeline", "DryRunReport",
     "EvaluatorBoundary", "EvaluatorBoundaryError", "EvaluationResult", "TaskSpec", "TaskValidity",
-    "GatewayDenied", "GatewayExchange", "GatewayPolicy",
+    "ExploratoryRun", "ExploratoryRunSummary", "GatewayDenied", "GatewayExchange", "GatewayPolicy",
     "HistoricalRecord", "build_prompt_context", "HashChain", "canonical_json", "sha256_file",
     "FrozenManifest", "ManifestError", "MockLLM", "MockLLMError", "MockScenario",
     "MutationProposal", "PermissionDenied", "LineageRecord", "ProvenanceError",
