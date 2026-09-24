@@ -6,6 +6,7 @@ backend de sandbox verificado e aprovado.
 
 from .budget import Budget, BudgetExceeded
 from .cassette import Cassette, CassetteError
+from .critical_integrity import CriticalIntegrityError, IntegrityReport, compute_kernel_hash, verify_before_critical_operation
 from .docker_profile import DockerProfileError, DockerSandboxProfile
 from .dry_run import DryRunPipeline, DryRunReport
 from .evaluator import EvaluatorBoundary, EvaluatorBoundaryError, EvaluationResult, TaskSpec, TaskValidity
@@ -27,6 +28,7 @@ from .validity import CandidateValidity, PromotionDenied, ValidityState
 
 __all__ = [
     "Budget", "BudgetExceeded", "Cassette", "CassetteError",
+    "CriticalIntegrityError", "IntegrityReport", "compute_kernel_hash", "verify_before_critical_operation",
     "DockerProfileError", "DockerSandboxProfile", "DryRunPipeline", "DryRunReport",
     "EvaluatorBoundary", "EvaluatorBoundaryError", "EvaluationResult", "TaskSpec", "TaskValidity",
     "ExploratoryRun", "ExploratoryRunSummary", "GatewayDenied", "GatewayExchange", "GatewayPolicy",
