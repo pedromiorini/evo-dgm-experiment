@@ -10,19 +10,15 @@ class PermissionDenied(PermissionError):
     """Proposta fora da allowlist ou tentando alterar um ativo protegido."""
 
 
+# Artefatos DEV, fixtures de tarefas e assets do evaluator possuem fluxos
+# próprios e não podem ser solicitados por uma mutação de GENOME.
+GENOME_MUTATION_ACTION = "modify_genome"
 PROTECTED_PATHS = frozenset(
     {
-        "kernel",
-        "evaluator",
-        "holdout",
-        "manifest",
-        "threat_model",
-        "official_logs",
-        "selection",
-        "permissions",
+        "kernel", "evaluator", "holdout", "manifest", "threat_model",
+        "official_logs", "selection", "permissions", "tasks", "fixtures",
     }
 )
-ALLOWED_ACTIONS = frozenset({"modify_genome", "add_test_fixture", "update_dev_trace"})
 
 
 @dataclass(frozen=True)
@@ -32,7 +28,7 @@ class MutationProposal:
     hypothesis: str
     diff_hash: str
     files: tuple[str, ...]
-    requested_action: str = "modify_genome"
+    requested_action: str = GENOME_MUTATION_ACTION
     requested_permissions: tuple[str, ...] = ()
     dependencies: tuple[str, ...] = ()
 
@@ -41,8 +37,8 @@ class MutationProposal:
             raise PermissionDenied("identidade, parent_id e diff_hash são obrigatórios")
         if not self.hypothesis.strip():
             raise PermissionDenied("hipótese vazia")
-        if self.requested_action not in ALLOWED_ACTIONS:
-            raise PermissionDenied("ação fora da allowlist")
+        if self.requested_action != GENOME_MUTATION_ACTION:
+            raise PermissionDenied("ação fora da allowlist de mutação de genoma")
         if not self.files or len(self.files) > max_files:
             raise PermissionDenied("quantidade de arquivos fora do limite")
         if len(self.dependencies) > max_dependencies:

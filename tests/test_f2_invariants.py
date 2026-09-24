@@ -19,16 +19,34 @@ def manifest_data():
     }
 
 
-def test_manifest_freezes_and_detects_mutation():
-    manifest = FrozenManifest.freeze(manifest_data())
+def test_manifest_is_recursively_immutable():
+    source = manifest_data()
+    manifest = FrozenManifest.freeze(source)
+    source["llm"]["model"] = "attacker-model"
     manifest.verify()
-    manifest.data["mode"] = "CONFIRMATORY"
     try:
-        manifest.verify()
+        manifest.data["mode"] = "CONFIRMATORY"
+    except TypeError:
+        pass
+    else:
+        raise AssertionError("manifesto permitiu mutação direta")
+    try:
+        manifest.data["llm"]["model"] = "attacker-model"
+    except TypeError:
+        pass
+    else:
+        raise AssertionError("manifesto permitiu mutação aninhada")
+
+
+def test_confirmatory_manifest_requires_confirmatory_fields():
+    data = manifest_data()
+    data["mode"] = "CONFIRMATORY"
+    try:
+        FrozenManifest.freeze(data)
     except ManifestError:
         pass
     else:
-        raise AssertionError("manifesto adulterado foi aceito")
+        raise AssertionError("manifesto confirmatório incompleto foi aceito")
 
 
 def test_manifest_requires_final_feedback_false():
@@ -58,6 +76,8 @@ def test_permission_allowlist_rejects_protected_paths_and_permissions():
     valid_proposal().validate()
     for proposal in (
         valid_proposal(files=("evaluator/checks.py",)),
+        valid_proposal(files=("tasks/fixture.py",)),
+        valid_proposal(requested_action="add_test_fixture"),
         valid_proposal(requested_permissions=("network",)),
         valid_proposal(files=("../escape.py",)),
     ):
@@ -83,23 +103,14 @@ def test_promotion_requires_all_validity_dimensions():
 
 def test_lineage_hash_detects_tampering():
     record = LineageRecord.create(
-        variant_id="v1",
-        parent_id="v0",
-        generation=1,
-        seed=7,
-        genome_hash="b" * 64,
-        diff_hash="c" * 64,
+        variant_id="v1", parent_id="v0", generation=1, seed=7,
+        genome_hash="b" * 64, diff_hash="c" * 64,
     )
     record.verify()
     tampered = LineageRecord(
-        variant_id=record.variant_id,
-        parent_id=record.parent_id,
-        generation=99,
-        seed=record.seed,
-        genome_hash=record.genome_hash,
-        diff_hash=record.diff_hash,
-        timestamp=record.timestamp,
-        record_hash=record.record_hash,
+        variant_id=record.variant_id, parent_id=record.parent_id, generation=99,
+        seed=record.seed, genome_hash=record.genome_hash, diff_hash=record.diff_hash,
+        timestamp=record.timestamp, record_hash=record.record_hash,
     )
     try:
         tampered.verify()
