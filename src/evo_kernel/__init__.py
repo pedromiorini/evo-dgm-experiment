@@ -16,8 +16,12 @@ from .integrity import HashChain, canonical_json, sha256_file
 from .manifest import FrozenManifest, ManifestError
 from .mock_llm import MockLLM, MockLLMError, MockScenario
 from .permissions import MutationProposal, PermissionDenied
+from .persistent_log import KernelLog, LogIntegrityError
 from .provenance import LineageRecord, ProvenanceError
-from .sandbox import IsolationStatus, SandboxUnavailable, verify_docker_isolation
+from .sandbox import (
+    IsolationStatus, SandboxEnvError, SandboxUnavailable, build_minimal_env,
+    make_isolated_workdir, require_isolation, verify_docker_isolation,
+)
 from .task_validation import TaskDefinition, TaskValidationError, TaskValidationResult
 from .validity import CandidateValidity, PromotionDenied, ValidityState
 
@@ -28,8 +32,9 @@ __all__ = [
     "ExploratoryRun", "ExploratoryRunSummary", "GatewayDenied", "GatewayExchange", "GatewayPolicy",
     "HistoricalRecord", "build_prompt_context", "HashChain", "canonical_json", "sha256_file",
     "FrozenManifest", "ManifestError", "MockLLM", "MockLLMError", "MockScenario",
-    "MutationProposal", "PermissionDenied", "LineageRecord", "ProvenanceError",
-    "IsolationStatus", "SandboxUnavailable", "verify_docker_isolation",
-    "TaskDefinition", "TaskValidationError", "TaskValidationResult",
+    "MutationProposal", "PermissionDenied", "KernelLog", "LogIntegrityError",
+    "LineageRecord", "ProvenanceError", "IsolationStatus", "SandboxEnvError",
+    "SandboxUnavailable", "build_minimal_env", "make_isolated_workdir", "require_isolation",
+    "verify_docker_isolation", "TaskDefinition", "TaskValidationError", "TaskValidationResult",
     "CandidateValidity", "PromotionDenied", "ValidityState",
 ]
