@@ -5,6 +5,7 @@ backend de sandbox verificado e aprovado.
 """
 
 from .attack_matrix import AttackGateError, AttackMatrix, AttackResult, AttackStatus
+from .attack_runner import AttackProbe, RuntimeAttackRunner
 from .budget import Budget, BudgetExceeded
 from .cassette import Cassette, CassetteError
 from .critical_integrity import CriticalIntegrityError, IntegrityReport, compute_kernel_hash, verify_before_critical_operation
@@ -31,7 +32,7 @@ from .task_validation import TaskDefinition, TaskValidationError, TaskValidation
 from .validity import CandidateValidity, PromotionDenied, ValidityState
 
 __all__ = [
-    "AttackGateError", "AttackMatrix", "AttackResult", "AttackStatus",
+    "AttackGateError", "AttackMatrix", "AttackResult", "AttackStatus", "AttackProbe", "RuntimeAttackRunner",
     "Budget", "BudgetExceeded", "Cassette", "CassetteError",
     "CriticalIntegrityError", "IntegrityReport", "compute_kernel_hash", "verify_before_critical_operation",
     "DevTrace", "DevTraceEntry", "DevTraceError", "sanitize_text",
