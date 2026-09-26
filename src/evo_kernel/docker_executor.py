@@ -77,11 +77,16 @@ class DockerExecutor:
     @staticmethod
     def _default_runner(argv: Sequence[str], timeout: float, stdin_data: str) -> tuple[int, str, str]:
         import subprocess
-        completed = subprocess.run(
-            argv, input=stdin_data, capture_output=True, text=True,
-            timeout=timeout, check=False,
-        )
-        return completed.returncode, completed.stdout, completed.stderr
+        try:
+            completed = subprocess.run(
+                argv, input=stdin_data, capture_output=True, text=True,
+                timeout=timeout, check=False,
+            )
+            return completed.returncode, completed.stdout, completed.stderr
+        except subprocess.TimeoutExpired as exc:
+            stdout = exc.stdout or ""
+            stderr = exc.stderr or ""
+            return -1, stdout if isinstance(stdout, str) else "", f"FAILED_CLOSED timeout: {stderr}"
 
     @staticmethod
     def _runtime_probe() -> str:
