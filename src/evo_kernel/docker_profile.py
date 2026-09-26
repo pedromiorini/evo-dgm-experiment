@@ -33,7 +33,7 @@ class DockerSandboxProfile:
     def command_args(self) -> tuple[str, ...]:
         self.validate()
         return (
-            "run", "--rm", "--network=none", "--read-only",
+            "run", "--rm", "--interactive", "--network=none", "--read-only",
             "--security-opt=no-new-privileges", "--cap-drop=ALL",
             f"--memory={self.memory}", f"--cpus={self.cpus}",
             f"--pids-limit={self.pids_limit}", f"--user={self.user}", self.image,
