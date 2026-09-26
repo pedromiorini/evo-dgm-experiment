@@ -24,6 +24,7 @@ from .mock_llm import MockLLM, MockLLMError, MockScenario
 from .permissions import MutationProposal, PermissionDenied
 from .persistent_log import KernelLog, LogIntegrityError
 from .provenance import LineageRecord, ProvenanceError
+from .readiness import ReadinessReport, RuntimeReadiness
 from .runtime_probes import default_runtime_probes
 from .sandbox import (
     IsolationStatus, SandboxEnvError, SandboxUnavailable, build_minimal_env,
@@ -45,8 +46,8 @@ __all__ = [
     "HistoricalRecord", "build_prompt_context", "HashChain", "canonical_json", "sha256_file",
     "FrozenManifest", "ManifestError", "MockLLM", "MockLLMError", "MockScenario",
     "MutationProposal", "PermissionDenied", "KernelLog", "LogIntegrityError",
-    "LineageRecord", "ProvenanceError", "default_runtime_probes", "IsolationStatus", "SandboxEnvError",
-    "SandboxUnavailable", "build_minimal_env", "make_isolated_workdir", "require_isolation",
-    "verify_docker_isolation", "TaskDefinition", "TaskValidationError", "TaskValidationResult",
+    "LineageRecord", "ProvenanceError", "ReadinessReport", "RuntimeReadiness", "default_runtime_probes",
+    "IsolationStatus", "SandboxEnvError", "SandboxUnavailable", "build_minimal_env", "make_isolated_workdir",
+    "require_isolation", "verify_docker_isolation", "TaskDefinition", "TaskValidationError", "TaskValidationResult",
     "CandidateValidity", "PromotionDenied", "ValidityState",
 ]

@@ -74,6 +74,10 @@ class DockerExecutor:
         self._timeout = timeout_seconds or profile.timeout_seconds
         self._evidence: RuntimeEvidence | None = None
 
+    @property
+    def evidence(self) -> RuntimeEvidence | None:
+        return self._evidence
+
     @staticmethod
     def _default_runner(argv: Sequence[str], timeout: float, stdin_data: str) -> tuple[int, str, str]:
         import subprocess
