@@ -12,6 +12,10 @@ from .dry_run import DryRunPipeline
 from .exploratory import ExploratoryRun
 from .gateway import GatewayPolicy
 from .manifest import FrozenManifest
+from .attack_matrix import AttackMatrix
+from .docker_executor import DockerExecutor
+from .docker_profile import DockerSandboxProfile
+from .readiness import RuntimeReadiness
 from .sandbox import verify_docker_isolation
 
 
@@ -89,6 +93,26 @@ def command_report(args: argparse.Namespace) -> int:
     return command_run(argparse.Namespace(generations=args.generations))
 
 
+def command_readiness(_: argparse.Namespace) -> int:
+    profile = DockerSandboxProfile("python:3.12-slim")
+    executor = DockerExecutor(profile)
+    report = RuntimeReadiness.assess(profile, executor, AttackMatrix.required_runtime_matrix())
+    print(json.dumps(report.as_dict(), ensure_ascii=False, sort_keys=True))
+    return 0
+
+
+def command_attack_matrix(_: argparse.Namespace) -> int:
+    matrix = AttackMatrix.required_runtime_matrix()
+    print(json.dumps({
+        "status": "UNVERIFIED",
+        "execution": "NOT_RUN",
+        "required_attack_ids": list(matrix.required_attack_ids),
+        "missing": list(matrix.missing),
+        "gate": "BLOCKED",
+    }, ensure_ascii=False, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="evo-kernel")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -103,6 +127,8 @@ def build_parser() -> argparse.ArgumentParser:
     report = sub.add_parser("report")
     report.add_argument("--generations", type=int, default=3)
     report.set_defaults(func=command_report)
+    sub.add_parser("readiness", help="inspeciona gates sem executar runtime").set_defaults(func=command_readiness)
+    sub.add_parser("attack-matrix", help="lista ataques sem executá-los").set_defaults(func=command_attack_matrix)
     return parser
 
 
