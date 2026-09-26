@@ -8,6 +8,7 @@ from .budget import Budget, BudgetExceeded
 from .cassette import Cassette, CassetteError
 from .critical_integrity import CriticalIntegrityError, IntegrityReport, compute_kernel_hash, verify_before_critical_operation
 from .dev_trace import DevTrace, DevTraceEntry, DevTraceError, sanitize_text
+from .docker_evaluator import DockerEvaluator, RuntimeEvalCase, RuntimeEvaluation
 from .docker_executor import DockerExecutor, DockerExecutorError, DockerRunResult, RuntimeEvidence
 from .docker_profile import DockerProfileError, DockerSandboxProfile
 from .dry_run import DryRunPipeline, DryRunReport
@@ -32,6 +33,7 @@ __all__ = [
     "Budget", "BudgetExceeded", "Cassette", "CassetteError",
     "CriticalIntegrityError", "IntegrityReport", "compute_kernel_hash", "verify_before_critical_operation",
     "DevTrace", "DevTraceEntry", "DevTraceError", "sanitize_text",
+    "DockerEvaluator", "RuntimeEvalCase", "RuntimeEvaluation",
     "DockerExecutor", "DockerExecutorError", "DockerRunResult", "RuntimeEvidence",
     "DockerProfileError", "DockerSandboxProfile", "DryRunPipeline", "DryRunReport",
     "EvaluatorBoundary", "EvaluatorBoundaryError", "EvaluationResult", "TaskSpec", "TaskValidity",
