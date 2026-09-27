@@ -33,3 +33,7 @@ Isso corrige a confusão acidental por substring, mas não declara que o candida
 ## Milestone seguinte: sentinels
 
 Foi adicionado `SentinelRegistry`, que mantém segredo aleatório no domínio kernel-only e classifica observações por digest do valor lido. A mera existência de path não é mais tratada como acesso. Esta é uma implementação de contrato e testes unitários; sentinels reais fora do domínio do container e execução adversarial ainda estão pendentes.
+
+## Evidência vinculada ao runtime
+
+`RuntimeEvidence` agora registra versão do daemon, referência e digest da imagem, hash do perfil, versão do probe, timestamp UTC e fingerprint. `DockerExecutor.run()` reconsulta a identidade do runtime antes de reutilizar evidência; mudança de daemon, imagem, perfil ou probe força novo probe e mantém `FAIL_CLOSED` em caso de falha. Testes cobrem metadados e invalidação quando a versão Docker muda.

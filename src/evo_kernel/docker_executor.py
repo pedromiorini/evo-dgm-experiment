@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Callable, Sequence
 
 from .docker_profile import DockerSandboxProfile
@@ -26,9 +28,16 @@ class RuntimeEvidence:
     uid_non_root: bool
     docker_socket_absent: bool
     protected_mounts_absent: bool
+    docker_server_version: str = ""
+    image_reference: str = ""
+    image_digest: str = ""
+    profile_hash: str = ""
+    probe_version: str = ""
+    timestamp: str = ""
+    runtime_fingerprint: str = ""
 
     @classmethod
-    def from_json(cls, payload: dict[str, object]) -> "RuntimeEvidence":
+    def from_json(cls, payload: dict[str, object], **metadata: str) -> "RuntimeEvidence":
         fields = (
             "rootless_or_userns", "no_new_privileges", "network_disabled",
             "seccomp_present", "resource_limits_verified",
@@ -38,11 +47,17 @@ class RuntimeEvidence:
         missing = [field for field in fields if not isinstance(payload.get(field), bool)]
         if missing:
             raise DockerExecutorError(f"evidência de runtime incompleta: {missing}")
-        return cls(**{field: payload[field] for field in fields})
+        return cls(**{field: payload[field] for field in fields}, **metadata)
 
     @property
     def approved(self) -> bool:
-        return all(self.__dict__.values())
+        fields = (
+            "rootless_or_userns", "no_new_privileges", "network_disabled",
+            "seccomp_present", "resource_limits_verified",
+            "disposable_filesystem_verified", "required_capabilities_verified",
+            "uid_non_root", "docker_socket_absent", "protected_mounts_absent",
+        )
+        return all(getattr(self, field) for field in fields)
 
 
 @dataclass(frozen=True)
@@ -74,6 +89,8 @@ def mountpoints_have_no_protected_targets(text: str) -> bool:
 class DockerExecutor:
     """Único caminho de execução Docker; não possui fallback para subprocesso."""
 
+    PROBE_VERSION = "runtime-probe-v2"
+
     def __init__(
         self,
         profile: DockerSandboxProfile,
@@ -92,6 +109,23 @@ class DockerExecutor:
     @property
     def evidence(self) -> RuntimeEvidence | None:
         return self._evidence
+
+    def _profile_hash(self) -> str:
+        payload = json.dumps(self.profile.command_args(), separators=(",", ":"))
+        return hashlib.sha256(payload.encode()).hexdigest()
+
+    def _runtime_identity(self, docker: str) -> tuple[str, str, str, str]:
+        code, stdout, stderr = self._runner(
+            (docker, "info", "--format", "{{.ServerVersion}}"), self._timeout, ""
+        )
+        if code != 0 or not stdout.strip():
+            raise DockerExecutorError(f"docker info falhou: {stderr.strip()}: FAIL_CLOSED")
+        server_version = stdout.strip()
+        image_digest = self.profile.image.split("@", 1)[1]
+        profile_hash = self._profile_hash()
+        identity = "|".join((server_version, self.profile.image, image_digest, profile_hash, self.PROBE_VERSION))
+        fingerprint = hashlib.sha256(identity.encode()).hexdigest()
+        return server_version, image_digest, profile_hash, fingerprint
 
     @staticmethod
     def _default_runner(argv: Sequence[str], timeout: float, stdin_data: str) -> tuple[int, str, str]:
@@ -202,15 +236,22 @@ print(json.dumps(result, sort_keys=True))'''
         docker = self._which("docker")
         if not docker:
             raise DockerExecutorError("Docker indisponível: FAIL_CLOSED")
-        info_code, _, info_err = self._runner((docker, "info"), self._timeout, "")
-        if info_code != 0:
-            raise DockerExecutorError(f"docker info falhou: {info_err.strip()}: FAIL_CLOSED")
+        server_version, image_digest, profile_hash, fingerprint = self._runtime_identity(docker)
         command = (docker, *self.profile.command_args(), "python3", "-c", self._runtime_probe())
         code, stdout, stderr = self._runner(command, self._timeout, "")
         if code != 0:
             raise DockerExecutorError(f"runtime probe falhou: {stderr.strip()}: FAIL_CLOSED")
         try:
-            evidence = RuntimeEvidence.from_json(json.loads(stdout))
+            evidence = RuntimeEvidence.from_json(
+                json.loads(stdout),
+                docker_server_version=server_version,
+                image_reference=self.profile.image,
+                image_digest=image_digest,
+                profile_hash=profile_hash,
+                probe_version=self.PROBE_VERSION,
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                runtime_fingerprint=fingerprint,
+            )
         except (json.JSONDecodeError, TypeError) as exc:
             raise DockerExecutorError("runtime probe não retornou JSON válido: FAIL_CLOSED") from exc
         self._evidence = evidence
@@ -221,7 +262,16 @@ print(json.dumps(result, sort_keys=True))'''
     def run(self, argv: Sequence[str], *, stdin_data: str = "") -> DockerRunResult:
         if not argv or any("\x00" in arg for arg in argv):
             raise DockerExecutorError("comando vazio ou inválido")
-        evidence = self._evidence or self.verify_runtime()
+        evidence = self._evidence
+        if evidence is not None:
+            docker = self._which("docker")
+            if not docker:
+                raise DockerExecutorError("Docker indisponível: FAIL_CLOSED")
+            _, _, _, current_fingerprint = self._runtime_identity(docker)
+            if current_fingerprint != evidence.runtime_fingerprint:
+                evidence = self.verify_runtime()
+        else:
+            evidence = self.verify_runtime()
         if not evidence.approved:
             raise DockerExecutorError("runtime não aprovado: FAIL_CLOSED")
         docker = self._which("docker")

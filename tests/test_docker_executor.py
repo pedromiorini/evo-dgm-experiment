@@ -49,6 +49,44 @@ def test_executor_rejects_incomplete_or_false_runtime_evidence():
         executor.verify_runtime()
 
 
+def test_runtime_evidence_contains_identity_metadata():
+    def runner(argv, timeout, stdin):
+        if argv[1] == "info":
+            return 0, "29.1.3\n", ""
+        return 0, evidence(), ""
+
+    executor = DockerExecutor(
+        DockerSandboxProfile(image="python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
+        runner=runner, which=lambda _: "/usr/bin/docker",
+    )
+    result = executor.verify_runtime()
+    assert result.docker_server_version == "29.1.3"
+    assert result.image_digest.startswith("sha256:")
+    assert result.profile_hash
+    assert result.probe_version == "runtime-probe-v2"
+    assert result.timestamp.endswith("+00:00")
+    assert len(result.runtime_fingerprint) == 64
+
+
+def test_run_revalidates_when_runtime_fingerprint_changes():
+    versions = iter(("29.1.3\n", "29.1.4\n", "29.1.4\n"))
+    calls = []
+
+    def runner(argv, timeout, stdin):
+        calls.append(tuple(argv))
+        if argv[1] == "info":
+            return 0, next(versions), ""
+        return 0, evidence(), ""
+
+    executor = DockerExecutor(
+        DockerSandboxProfile(image="python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
+        runner=runner, which=lambda _: "/usr/bin/docker",
+    )
+    executor.verify_runtime()
+    executor.run(("python3", "-c", "print('ok')"))
+    assert sum(argv[1] == "info" for argv in calls) == 3
+
+
 def test_executor_requires_probe_before_run_and_forwards_stdin():
     calls = []
 
