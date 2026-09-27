@@ -14,12 +14,17 @@ class AttackProbe:
     attack_id: str
     name: str
     command: tuple[str, ...]
+    expected_safe_status: AttackStatus = AttackStatus.BLOCKED
+    classification_rule: str = "exact-marker"
+    evidence_type: str = "runtime-observation"
 
     def validate(self) -> None:
         if not self.attack_id or not self.name or not self.command:
             raise ValueError("probe de ataque incompleto")
         if any("\x00" in part for part in self.command):
             raise ValueError("probe contém NUL")
+        if not self.classification_rule or not self.evidence_type:
+            raise ValueError("probe sem regra de classificação ou tipo de evidência")
 
 
 class RuntimeAttackRunner:
@@ -53,7 +58,11 @@ class RuntimeAttackRunner:
             status = AttackStatus.UNVERIFIED
         return AttackResult(
             probe.attack_id, probe.name, status,
-            f"returncode={result.returncode}; output_classification={status.value}",
+            "returncode=" + str(result.returncode)
+            + f"; expected_safe={probe.expected_safe_status.value}"
+            + f"; evidence_type={probe.evidence_type}"
+            + f"; classification_rule={probe.classification_rule}"
+            + f"; output_classification={status.value}",
         )
 
     def run_matrix(self, matrix: AttackMatrix, probes: Sequence[AttackProbe]) -> None:

@@ -37,3 +37,7 @@ Foi adicionado `SentinelRegistry`, que mantém segredo aleatório no domínio ke
 ## Evidência vinculada ao runtime
 
 `RuntimeEvidence` agora registra versão do daemon, referência e digest da imagem, hash do perfil, versão do probe, timestamp UTC e fingerprint. `DockerExecutor.run()` reconsulta a identidade do runtime antes de reutilizar evidência; mudança de daemon, imagem, perfil ou probe força novo probe e mantém `FAIL_CLOSED` em caso de falha. Testes cobrem metadados e invalidação quando a versão Docker muda.
+
+## Contrato estruturado dos probes
+
+Cada `AttackProbe` agora declara `expected_safe_status`, `classification_rule` e `evidence_type`. O probe de exaustão declara `FAILED_CLOSED` como resultado seguro; os checks de existência permanecem marcados como preliminares, sem serem promovidos a evidência final. A próxima etapa continua sendo sentinels físicos e observação independente.
