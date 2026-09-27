@@ -56,6 +56,21 @@ Runner = Callable[[Sequence[str], float, str], tuple[int, str, str]]
 Which = Callable[[str], str | None]
 
 
+def mountpoints_have_no_protected_targets(text: str) -> bool:
+    """Verifica destinos de mount, ignorando caminhos de origem do Docker."""
+    forbidden = ('/var/run/docker.sock', '/var/lib/docker', '/home/ubuntu', '/workspace')
+    mountpoints = []
+    for line in text.splitlines():
+        before_separator = line.split(' - ', 1)[0].split()
+        if len(before_separator) >= 5:
+            mountpoints.append(before_separator[4])
+    return not any(
+        mountpoint == item or mountpoint.startswith(item + '/')
+        for mountpoint in mountpoints
+        for item in forbidden
+    )
+
+
 class DockerExecutor:
     """Único caminho de execução Docker; não possui fallback para subprocesso."""
 
@@ -135,6 +150,19 @@ def network_off():
     except OSError:
         return False
 
+def mountpoints_have_no_protected_targets(text):
+    forbidden = ('/var/run/docker.sock', '/var/lib/docker', '/home/ubuntu', '/workspace')
+    mountpoints = []
+    for line in text.splitlines():
+        before_separator = line.split(' - ', 1)[0].split()
+        if len(before_separator) >= 5:
+            mountpoints.append(before_separator[4])
+    return not any(
+        mountpoint == item or mountpoint.startswith(item + '/')
+        for mountpoint in mountpoints
+        for item in forbidden
+    )
+
 def root_read_only():
     probe = pathlib.Path('/evo_dgm_runtime_write_probe')
     try:
@@ -147,8 +175,7 @@ def root_read_only():
 def no_protected_mounts():
     try:
         text = pathlib.Path('/proc/self/mountinfo').read_text()
-        forbidden = ('/var/run/docker.sock', '/var/lib/docker', '/home/ubuntu', '/workspace')
-        return not any(item in text for item in forbidden)
+        return mountpoints_have_no_protected_targets(text)
     except OSError:
         return False
 

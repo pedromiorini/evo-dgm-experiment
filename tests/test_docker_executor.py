@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from evo_kernel.docker_executor import DockerExecutor, DockerExecutorError
+from evo_kernel.docker_executor import DockerExecutor, DockerExecutorError, mountpoints_have_no_protected_targets
 from evo_kernel.docker_profile import DockerSandboxProfile
 
 
@@ -82,3 +82,10 @@ def test_executor_does_not_accept_empty_or_nul_command():
         executor.run(())
     with pytest.raises(DockerExecutorError):
         executor.run(("python\x00",))
+
+
+def test_mount_check_ignores_docker_source_path_when_target_is_safe():
+    safe = "126 91 254:0 /var/lib/docker/containers/id/hosts /etc/hosts ro - ext4 /dev/root rw"
+    protected = "127 91 254:0 /dev/root /workspace ro - ext4 /dev/root rw"
+    assert mountpoints_have_no_protected_targets(safe)
+    assert not mountpoints_have_no_protected_targets(protected)
