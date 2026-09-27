@@ -45,3 +45,9 @@ def test_readiness_and_attack_matrix_are_inspection_only(capsys):
     matrix = parse_output(capsys)
     assert matrix["execution"] == "NOT_RUN"
     assert matrix["gate"] == "BLOCKED"
+
+
+def test_preflight_never_authorizes_genome_execution(capsys):
+    assert main(["preflight"]) == 0
+    output = parse_output(capsys)
+    assert output["genome_execution"] == "BLOCKED"

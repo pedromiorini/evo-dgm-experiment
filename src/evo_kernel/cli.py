@@ -113,6 +113,24 @@ def command_attack_matrix(_: argparse.Namespace) -> int:
     return 0
 
 
+def command_preflight(_: argparse.Namespace) -> int:
+    profile = DockerSandboxProfile("python:3.12-slim")
+    executor = DockerExecutor(profile)
+    error = None
+    try:
+        executor.verify_runtime()
+    except Exception as exc:
+        error = str(exc)
+    evidence = executor.evidence
+    print(json.dumps({
+        "status": "APPROVED" if evidence is not None and evidence.approved else "FAIL_CLOSED",
+        "error": error,
+        "evidence": None if evidence is None else evidence.__dict__,
+        "genome_execution": "BLOCKED",
+    }, ensure_ascii=False, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="evo-kernel")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -129,6 +147,7 @@ def build_parser() -> argparse.ArgumentParser:
     report.set_defaults(func=command_report)
     sub.add_parser("readiness", help="inspeciona gates sem executar runtime").set_defaults(func=command_readiness)
     sub.add_parser("attack-matrix", help="lista ataques sem executá-los").set_defaults(func=command_attack_matrix)
+    sub.add_parser("preflight", help="executa somente o probe Docker real").set_defaults(func=command_preflight)
     return parser
 
 

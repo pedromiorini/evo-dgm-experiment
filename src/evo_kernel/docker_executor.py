@@ -213,9 +213,9 @@ print(json.dumps(result, sort_keys=True))'''
             evidence = RuntimeEvidence.from_json(json.loads(stdout))
         except (json.JSONDecodeError, TypeError) as exc:
             raise DockerExecutorError("runtime probe não retornou JSON válido: FAIL_CLOSED") from exc
+        self._evidence = evidence
         if not evidence.approved:
             raise DockerExecutorError("runtime não comprovou todos os invariantes: FAIL_CLOSED")
-        self._evidence = evidence
         return evidence
 
     def run(self, argv: Sequence[str], *, stdin_data: str = "") -> DockerRunResult:
