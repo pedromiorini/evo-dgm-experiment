@@ -67,9 +67,15 @@ def test_evaluator_result_rejects_hidden_test_exposure():
 
 
 def test_docker_profile_is_restrictive_and_non_executing():
-    args = DockerSandboxProfile("candidate-image").command_args()
+    args = DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f").command_args()
+    assert "--pull=never" in args
     assert "--network=none" in args
     assert "--read-only" in args
     assert "--cap-drop=ALL" in args
     with pytest.raises(DockerProfileError):
-        DockerSandboxProfile("candidate-image", network="bridge").command_args()
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f", network="bridge").command_args()
+
+
+def test_docker_profile_rejects_mutable_image_tag():
+    with pytest.raises(DockerProfileError, match="digest"):
+        DockerSandboxProfile("python:3.12-slim").command_args()

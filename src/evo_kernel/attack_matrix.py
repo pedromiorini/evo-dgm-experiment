@@ -84,9 +84,7 @@ class AttackMatrix:
             raise AttackGateError(f"ataques sem resultado: {', '.join(self.missing)}")
         invalid = [
             item for item, result in self._results.items()
-            if result.status not in {
-                AttackStatus.BLOCKED, AttackStatus.DETECTED, AttackStatus.FAILED_CLOSED,
-            }
+            if result.status not in {AttackStatus.BLOCKED, AttackStatus.FAILED_CLOSED}
         ]
         if invalid:
             raise AttackGateError(f"ataques não aprováveis: {', '.join(invalid)}")

@@ -94,7 +94,7 @@ def command_report(args: argparse.Namespace) -> int:
 
 
 def command_readiness(_: argparse.Namespace) -> int:
-    profile = DockerSandboxProfile("python:3.12-slim")
+    profile = DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f")
     executor = DockerExecutor(profile)
     report = RuntimeReadiness.assess(profile, executor, AttackMatrix.required_runtime_matrix())
     print(json.dumps(report.as_dict(), ensure_ascii=False, sort_keys=True))
@@ -114,7 +114,7 @@ def command_attack_matrix(_: argparse.Namespace) -> int:
 
 
 def command_preflight(_: argparse.Namespace) -> int:
-    profile = DockerSandboxProfile("python:3.12-slim")
+    profile = DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f")
     executor = DockerExecutor(profile)
     error = None
     try:

@@ -17,12 +17,19 @@ def test_missing_attack_cannot_open_gate():
         matrix.assert_gate_open()
 
 
-def test_blocked_detected_and_failed_closed_are_approvable():
+def test_blocked_and_failed_closed_are_approvable():
     matrix = AttackMatrix(("a", "b", "c"), {})
     matrix.record(AttackResult("a", "a", AttackStatus.BLOCKED, "probe blocked"))
-    matrix.record(AttackResult("b", "b", AttackStatus.DETECTED, "kernel detected"))
-    matrix.record(AttackResult("c", "c", AttackStatus.FAILED_CLOSED, "gate stopped"))
+    matrix.record(AttackResult("b", "b", AttackStatus.FAILED_CLOSED, "gate stopped"))
+    matrix.record(AttackResult("c", "c", AttackStatus.BLOCKED, "probe blocked"))
     matrix.assert_gate_open()
+
+
+def test_detected_attack_cannot_open_gate():
+    matrix = AttackMatrix(("a",), {})
+    matrix.record(AttackResult("a", "a", AttackStatus.DETECTED, "exploit succeeded"))
+    with pytest.raises(AttackGateError, match="não aprováveis"):
+        matrix.assert_gate_open()
 
 
 def test_duplicate_or_unknown_attack_is_rejected():

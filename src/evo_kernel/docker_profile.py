@@ -23,8 +23,8 @@ class DockerSandboxProfile:
     user: str = "65532:65532"
 
     def validate(self) -> None:
-        if not self.image or self.network != "none":
-            raise DockerProfileError("imagem e rede negada são obrigatórias")
+        if not self.image or "@sha256:" not in self.image or self.network != "none":
+            raise DockerProfileError("imagem deve ser fixada por digest e rede negada é obrigatória")
         if not self.read_only or not self.no_new_privileges or not self.drop_all_capabilities:
             raise DockerProfileError("perfil não atende filesystem read-only/no-new-privileges/cap-drop")
         if self.pids_limit <= 0 or self.timeout_seconds <= 0:
@@ -33,7 +33,7 @@ class DockerSandboxProfile:
     def command_args(self) -> tuple[str, ...]:
         self.validate()
         return (
-            "run", "--rm", "--interactive", "--network=none", "--read-only",
+            "run", "--rm", "--pull=never", "--interactive", "--network=none", "--read-only",
             "--security-opt=no-new-privileges", "--cap-drop=ALL",
             f"--memory={self.memory}", f"--cpus={self.cpus}",
             f"--pids-limit={self.pids_limit}", f"--user={self.user}", self.image,

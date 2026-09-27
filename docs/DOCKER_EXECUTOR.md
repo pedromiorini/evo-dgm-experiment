@@ -9,3 +9,5 @@ O executor não possui fallback para subprocesso. Se Docker estiver ausente, o p
 O Docker real agora está acessível ao usuário do projeto e o probe comprovou 9 de 10 propriedades. O bloqueio residual é `rootless_or_userns=false`: o daemon está rootful sem user namespace remapeado. A opção `--userns=private` foi testada e rejeitada pelo Docker atual. Não há autorização para relaxar esse requisito nem para alterar o daemon sem revisão separada.
 
 Os testes usam runner injetado para validar política e regressões, mas não substituem a execução real. A evidência detalhada está em [DOCKER_RUNTIME_EVIDENCE.md](DOCKER_RUNTIME_EVIDENCE.md). A execução de genomas continua bloqueada até a propriedade residual ser resolvida e revalidada.
+
+A imagem experimental é referenciada por digest (`python@sha256:...`) e o perfil sempre inclui `--pull=never`; tags mutáveis e pull implícito são rejeitados.

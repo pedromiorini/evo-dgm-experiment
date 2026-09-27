@@ -2,7 +2,7 @@
 
 Em 2026-09-27, após autorização explícita, o usuário `ubuntu` foi adicionado ao grupo `docker` para permitir acesso ao daemon sem `sudo`.
 
-O daemon Docker 29.1.3 respondeu a `docker info` em sessão com o grupo aplicado. O probe real do perfil `python:3.12-slim` produziu:
+O daemon Docker 29.1.3 respondeu a `docker info` em sessão com o grupo aplicado. O probe real do perfil `python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f` produziu:
 
 | Propriedade | Resultado |
 |---|---|

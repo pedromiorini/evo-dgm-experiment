@@ -25,7 +25,7 @@ def evidence(**overrides):
 
 def test_executor_fails_closed_without_docker():
     executor = DockerExecutor(
-        DockerSandboxProfile(image="python:3.12-slim"),
+        DockerSandboxProfile(image="python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
         which=lambda _: None,
     )
     with pytest.raises(DockerExecutorError, match="FAIL_CLOSED"):
@@ -42,7 +42,7 @@ def test_executor_rejects_incomplete_or_false_runtime_evidence():
         return 0, evidence(network_disabled=False), ""
 
     executor = DockerExecutor(
-        DockerSandboxProfile(image="python:3.12-slim"),
+        DockerSandboxProfile(image="python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
         runner=runner, which=lambda _: "/usr/bin/docker",
     )
     with pytest.raises(DockerExecutorError, match="invariantes"):
@@ -61,7 +61,7 @@ def test_executor_requires_probe_before_run_and_forwards_stdin():
         return 0, "result", ""
 
     executor = DockerExecutor(
-        DockerSandboxProfile(image="python:3.12-slim"),
+        DockerSandboxProfile(image="python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
         runner=runner, which=lambda _: "/usr/bin/docker",
     )
     result = executor.run(("python3", "-c", "print('ok')"), stdin_data="input")
@@ -75,7 +75,7 @@ def test_executor_requires_probe_before_run_and_forwards_stdin():
 
 def test_executor_does_not_accept_empty_or_nul_command():
     executor = DockerExecutor(
-        DockerSandboxProfile(image="python:3.12-slim"),
+        DockerSandboxProfile(image="python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
         which=lambda _: None,
     )
     with pytest.raises(DockerExecutorError):
