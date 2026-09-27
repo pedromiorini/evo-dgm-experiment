@@ -29,3 +29,7 @@ A suíte local final desta etapa: **68 testes aprovados**. Isso não é evidênc
 A auditoria apontou que substring arbitrária como `previous attempt was BLOCKED` poderia ser interpretada como evidência. O `RuntimeAttackRunner` agora exige uma única linha exata em stdout (`BLOCKED`, `DETECTED` ou `FAILED_CLOSED`) e stderr vazio; qualquer texto adicional permanece `UNVERIFIED`. A regressão correspondente está em `test_runner_does_not_trust_arbitrary_text_containing_marker`.
 
 Isso corrige a confusão acidental por substring, mas não declara que o candidato pode provar a própria segurança. A limitação permanece registrada: a próxima milestone deve usar ações concretas, sentinels protegidos e observação independente do kernel/runtime para produzir resultados dos 13 ataques.
+
+## Milestone seguinte: sentinels
+
+Foi adicionado `SentinelRegistry`, que mantém segredo aleatório no domínio kernel-only e classifica observações por digest do valor lido. A mera existência de path não é mais tratada como acesso. Esta é uma implementação de contrato e testes unitários; sentinels reais fora do domínio do container e execução adversarial ainda estão pendentes.
