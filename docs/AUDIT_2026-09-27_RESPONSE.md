@@ -23,3 +23,9 @@ O Docker daemon 29.1.3 respondeu sem `sudo` em sessão com grupo `docker`. O pro
 - logs locais continuam `TAMPER_EVIDENT_LOCAL_ONLY`.
 
 A suíte local final desta etapa: **68 testes aprovados**. Isso não é evidência científica nem autorização para execução de genomas.
+
+## Correção posterior da classificação do runner
+
+A auditoria apontou que substring arbitrária como `previous attempt was BLOCKED` poderia ser interpretada como evidência. O `RuntimeAttackRunner` agora exige uma única linha exata em stdout (`BLOCKED`, `DETECTED` ou `FAILED_CLOSED`) e stderr vazio; qualquer texto adicional permanece `UNVERIFIED`. A regressão correspondente está em `test_runner_does_not_trust_arbitrary_text_containing_marker`.
+
+Isso corrige a confusão acidental por substring, mas não declara que o candidato pode provar a própria segurança. A limitação permanece registrada: a próxima milestone deve usar ações concretas, sentinels protegidos e observação independente do kernel/runtime para produzir resultados dos 13 ataques.

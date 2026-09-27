@@ -37,12 +37,17 @@ class RuntimeAttackRunner:
                 probe.attack_id, probe.name, AttackStatus.UNVERIFIED,
                 f"runtime indisponível ou não aprovado: {exc}",
             )
-        output = f"{result.stdout}\n{result.stderr}".upper()
-        if "BLOCKED" in output:
+        stdout = result.stdout.strip().upper()
+        stderr = result.stderr.strip()
+        # A saída do container é não confiável: só uma linha marcador exata,
+        # sem stderr, pode ser interpretada. Texto arbitrário nunca prova segurança.
+        if stderr or "\n" in stdout or "\r" in stdout:
+            status = AttackStatus.UNVERIFIED
+        elif stdout == "BLOCKED":
             status = AttackStatus.BLOCKED
-        elif "DETECTED" in output:
+        elif stdout == "DETECTED":
             status = AttackStatus.DETECTED
-        elif "FAILED_CLOSED" in output:
+        elif stdout == "FAILED_CLOSED":
             status = AttackStatus.FAILED_CLOSED
         else:
             status = AttackStatus.UNVERIFIED

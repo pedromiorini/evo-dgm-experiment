@@ -30,7 +30,7 @@ def test_runner_classifies_only_explicit_markers():
             return 0, "ok", ""
         if any("rootless_or_userns" in arg for arg in argv):
             return 0, evidence(), ""
-        return 0, "BLOCKED: network unreachable", ""
+        return 0, "BLOCKED", ""
 
     runner = RuntimeAttackRunner(DockerExecutor(
         DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), runner=fake, which=lambda _: "/docker",
@@ -49,6 +49,22 @@ def test_runner_does_not_upgrade_ambiguous_output():
 
     runner = RuntimeAttackRunner(DockerExecutor(
         DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), runner=fake, which=lambda _: "/docker",
+    ))
+    result = runner.run_probe(AttackProbe("network_escape", "network", ("python3", "-c", "probe")))
+    assert result.status == AttackStatus.UNVERIFIED
+
+
+def test_runner_does_not_trust_arbitrary_text_containing_marker():
+    def fake(argv, timeout, stdin):
+        if argv[1] == "info":
+            return 0, "ok", ""
+        if any("rootless_or_userns" in arg for arg in argv):
+            return 0, evidence(), ""
+        return 0, "previous attempt was BLOCKED", ""
+
+    runner = RuntimeAttackRunner(DockerExecutor(
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
+        runner=fake, which=lambda _: "/docker",
     ))
     result = runner.run_probe(AttackProbe("network_escape", "network", ("python3", "-c", "probe")))
     assert result.status == AttackStatus.UNVERIFIED
