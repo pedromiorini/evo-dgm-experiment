@@ -20,7 +20,7 @@ def runtime_evidence():
 
 def test_evaluator_fails_closed_without_docker():
     evaluator = DockerEvaluator(DockerExecutor(
-        DockerSandboxProfile("python:3.12-slim"), which=lambda _: None,
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), which=lambda _: None,
     ))
     with pytest.raises(DockerExecutorError, match="FAIL_CLOSED"):
         evaluator.evaluate(
@@ -43,7 +43,7 @@ def test_evaluator_returns_only_sanitized_result_and_never_sends_expected_output
         return 0, "x", ""
 
     evaluator = DockerEvaluator(DockerExecutor(
-        DockerSandboxProfile("python:3.12-slim"),
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"),
         runner=runner, which=lambda _: "/usr/bin/docker",
     ))
     output = evaluator.evaluate(

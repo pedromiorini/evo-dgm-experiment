@@ -18,7 +18,7 @@ def evidence():
 
 def test_runner_marks_missing_runtime_unverified():
     runner = RuntimeAttackRunner(DockerExecutor(
-        DockerSandboxProfile("python:3.12-slim"), which=lambda _: None,
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), which=lambda _: None,
     ))
     result = runner.run_probe(AttackProbe("network_escape", "network", ("python3", "-c", "x")))
     assert result.status == AttackStatus.UNVERIFIED
@@ -33,7 +33,7 @@ def test_runner_classifies_only_explicit_markers():
         return 0, "BLOCKED: network unreachable", ""
 
     runner = RuntimeAttackRunner(DockerExecutor(
-        DockerSandboxProfile("python:3.12-slim"), runner=fake, which=lambda _: "/docker",
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), runner=fake, which=lambda _: "/docker",
     ))
     result = runner.run_probe(AttackProbe("network_escape", "network", ("python3", "-c", "probe")))
     assert result.status == AttackStatus.BLOCKED
@@ -48,7 +48,7 @@ def test_runner_does_not_upgrade_ambiguous_output():
         return 0, "connection result unknown", ""
 
     runner = RuntimeAttackRunner(DockerExecutor(
-        DockerSandboxProfile("python:3.12-slim"), runner=fake, which=lambda _: "/docker",
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), runner=fake, which=lambda _: "/docker",
     ))
     result = runner.run_probe(AttackProbe("network_escape", "network", ("python3", "-c", "probe")))
     assert result.status == AttackStatus.UNVERIFIED
@@ -63,7 +63,7 @@ def test_matrix_runner_records_results():
         return 0, "FAILED_CLOSED", ""
 
     attack_runner = RuntimeAttackRunner(DockerExecutor(
-        DockerSandboxProfile("python:3.12-slim"), runner=fake, which=lambda _: "/docker",
+        DockerSandboxProfile("python@sha256:f77ac9e44ae96ef2c90b8053ea08c31f8be030f824196b0ae4db6d462c84e51f"), runner=fake, which=lambda _: "/docker",
     ))
     matrix = AttackMatrix(("network_escape",), {})
     attack_runner.run_matrix(matrix, (AttackProbe("network_escape", "network", ("python3", "-c", "probe")),))
