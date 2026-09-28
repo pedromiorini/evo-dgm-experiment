@@ -48,3 +48,38 @@ Até essas decisões, nenhum acesso ao socket, configuração do daemon, execuç
 ## 4. Saída esperada após a decisão
 
 A alternativa selecionada deve gerar uma nova evidência versionada contendo configuração, imagem/runtime fixados, fingerprint, resultados dos probes, resultados dos 13 ataques com observação independente, limitações e risco residual. Somente depois disso o `RuntimeReadiness` poderá considerar o runtime verificado; ainda será necessário demonstrar evaluator e holdout separados.
+
+## 5. Modelo de decisão auditável
+
+Para cada requisito, a análise deve distinguir:
+
+1. **Mecanismo:** configuração ou componente que pretende fornecer a proteção.
+2. **Propriedade:** comportamento de segurança que deve ser verdadeiro no runtime.
+3. **Observação:** medição feita por componente confiável, fora do domínio do candidato.
+4. **Critério de aceitação:** regra objetiva `PASS`, `FAIL` ou `UNVERIFIED`.
+5. **Risco residual:** o que continua possível mesmo após a evidência.
+
+Exemplo: `userns-remap` é mecanismo; separação efetiva da identidade privilegiada do host é propriedade; UID/GID mapping mais tentativa concreta de escrita/escape observada externamente é evidência; ausência de observação mantém `UNVERIFIED`. O booleano `rootless_or_userns` pode ser parte da configuration evidence, mas não substitui behavioral evidence.
+
+## 6. Configuration evidence versus behavioral evidence
+
+**Configuration evidence** registra versão do mecanismo, imagem e digest, flags, mounts declarados, capabilities, namespaces, seccomp, cgroups, rede, profile hash e runtime fingerprint. Ela demonstra o que foi configurado ou exposto pelo runtime.
+
+**Behavioral evidence** registra tentativa concreta de acesso, escape, exfiltração, alteração ou exaustão, com resultado observado externamente ao candidato. Ela demonstra o que efetivamente ocorreu sob a configuração.
+
+Configuration evidence sozinha não promove ataque para `BLOCKED`. Para propriedades comportamentais, a aprovação exige behavioral evidence. Uma falha de observação, saída ambígua ou ausência de execução é `UNVERIFIED`.
+
+## 7. Modelo de observação e boundaries
+
+Para cada ataque da matriz, o relatório deve registrar quem inicia a tentativa, onde ela ocorre, qual componente observa o resultado, qual artefato é coletado, qual componente é trusted e qual é untrusted. O candidato pode produzir dados de I/O, mas não pode declarar sozinho o próprio resultado; o kernel, runtime, watchdog, auditor externo ou comparação de nonce deve classificar a evidência.
+
+Há duas boundaries diferentes:
+
+- **Security boundary:** impede escape do candidato para host, processos, credenciais, rede ou filesystem protegido.
+- **Evaluator boundary:** impede que o candidato observe, altere ou infira evaluator, holdout e regras secretas.
+
+Uma boundary adequada para a primeira não é presumida adequada para a segunda. Ambas devem ser demonstradas separadamente.
+
+## 8. Fingerprint da evidência
+
+Toda evidência aprovada deverá estar vinculada a um runtime específico e conter, conforme aplicável: identificador do host/runtime, versão do mecanismo, imagem e digest, hash do profile, versão do probe, versão do evaluator, versão do kernel/protocolo, timestamp, identificador da execução e hash dos artefatos de evidência. Mudança em qualquer elemento relevante invalida a evidência até nova verificação.
