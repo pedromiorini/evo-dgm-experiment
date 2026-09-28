@@ -22,6 +22,8 @@ A tabela não é um ranking. Ela registra hipóteses de boundary que precisam se
 
 A comparação factual detalhada, também sem ranking ou seleção, está em [INFRASTRUCTURE_COMPARISON.md](INFRASTRUCTURE_COMPARISON.md).
 
+O inventário read-only do ambiente atual está em [ENVIRONMENT_INVENTORY_2026-09-28.md](ENVIRONMENT_INVENTORY_2026-09-28.md). Disponibilidade preliminar não constitui aprovação.
+
 | Alternativa | Ameaças que pode mitigar | Propriedades potenciais | Limitações/riscos a verificar | Impacto operacional e custo | Evidência mínima para aprovação |
 |---|---|---|---|---|---|
 | Docker rootless | Reduz impacto de daemon/containers rootful e escalada para host | Não-root efetivo, isolamento de namespaces, limites, rede negada, caps drop | Não elimina bugs de kernel, fuga de namespace, mounts indevidos ou vazamento lógico; compatibilidade de volumes/cgroups | Pode exigir instalação e daemon por usuário; mudanças em throughput, cgroups e operação | `docker info` rootless, UID/userns dentro do container, probe completo, 13 ataques, fingerprint e revisão de mounts |
