@@ -8,7 +8,7 @@ Cada `RuntimeEvidence` também registra `docker_server_version`, `image_referenc
 
 O executor não possui fallback para subprocesso. Se Docker estiver ausente, o probe falhar ou qualquer propriedade for falsa, ele lança `DockerExecutorError` com `FAIL_CLOSED`. O perfil inclui `--interactive` para preservar o transporte stdin/stdout necessário ao evaluator, sem alocar TTY.
 
-O Docker real está acessível ao usuário do projeto e o probe comprovou 9 de 10 propriedades. O bloqueio residual é `rootless_or_userns=false`: o daemon está rootful sem user namespace remapeado. A opção `--userns=private` foi testada e rejeitada pelo Docker atual. Não há autorização para relaxar esse requisito nem para alterar o daemon sem revisão separada.
+Na rechecagem de 2026-09-28, Docker `29.1.3` e o serviço estavam ativos, mas a sessão `ubuntu` não tinha acesso ao socket. A inspeção somente-leitura privilegiada mostrou daemon rootful, sem `rootless` ou `userns`; portanto o probe do processo experimental não pôde ser executado e o bloqueio não é apenas uma permissão. A opção `--userns=private` não pode ser tratada como solução sem validação específica. Não há autorização para conceder acesso ao socket, alterar o daemon ou relaxar o requisito.
 
 A imagem experimental é referenciada por digest (`python@sha256:...`) e o perfil sempre inclui `--pull=never`; tags mutáveis e pull implícito são rejeitados.
 

@@ -22,4 +22,4 @@ Esses itens continuam bloqueando a execução real e qualquer conclusão de F2. 
 
 ## Validação desta correção
 
-A suíte local passou em **31 testes**. O ambiente atual retorna `docker_not_installed`, e o código continua sem executar containers, código de candidato ou chamadas externas.
+A suíte histórica passou em **31 testes**. Na rechecagem de 2026-09-28, Docker `29.1.3` está instalado e o serviço ativo, mas a sessão experimental não acessa o socket e o daemon não mostrou rootless/userns. O preflight atual permanece `FAIL_CLOSED`; nenhum container, genoma ou chamada externa foi executado.

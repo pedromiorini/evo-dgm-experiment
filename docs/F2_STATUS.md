@@ -2,7 +2,7 @@
 
 ## Estado
 
-A F2 está parcialmente implementada em modo exploratório, sem execução de genomas. O ambiente atual não possui Docker; por isso a política permanece `FAIL_CLOSED` e nenhum backend de sandbox pode aceitar código mutável.
+A F2 está parcialmente implementada em modo exploratório, sem execução de genomas. O ambiente atual possui Docker `29.1.3` e serviço ativo, mas a sessão experimental não tem acesso ao socket e a inspeção do daemon não mostrou rootless/userns; por isso a política permanece `FAIL_CLOSED` e nenhum backend de sandbox pode aceitar código mutável.
 
 ## Controles implementados
 
@@ -11,7 +11,7 @@ A F2 está parcialmente implementada em modo exploratório, sem execução de ge
 | Hash chain de logs | Implementado | `src/evo_kernel/integrity.py` e testes de adulteração |
 | Contador de orçamento | Implementado | `src/evo_kernel/budget.py` e teste de overrun |
 | Histórico entre gerações como dado | Implementado | `src/evo_kernel/history.py` e testes de hash/injeção |
-| Pré-voo de isolamento | Implementado | `src/evo_kernel/sandbox.py`; retorna `docker_not_installed` |
+| Pré-voo de isolamento | Implementado | `src/evo_kernel/sandbox.py`; estado atual é indisponível/inacessível e FAIL_CLOSED |
 | Manifesto congelado | Implementado | `src/evo_kernel/manifest.py` |
 | Allowlist de mutações | Implementado | `src/evo_kernel/permissions.py` |
 | Estados de validade | Implementado | `src/evo_kernel/validity.py` |
@@ -22,6 +22,6 @@ A F2 está parcialmente implementada em modo exploratório, sem execução de ge
 
 ## O que ainda bloqueia a conclusão da F2
 
-Ainda é necessário validar um runtime real com Docker rootless, `no-new-privileges`, seccomp, capabilities mínimas, rede negada, filesystem descartável e limites de CPU/RAM/processos/tempo. Também falta executar o evaluator isolado, validar o gateway contra um provider real ou cassette aprovado e executar os ataques de sandbox que só podem ser realizados em ambiente apropriado.
+Ainda é necessário decidir e validar uma boundary real com Docker rootless, userns-remap, gVisor, Kata, Firecracker/VM ou alternativa equivalente; depois demonstrar `no-new-privileges`, seccomp/boundary equivalente, capabilities mínimas, rede negada, filesystem descartável e limites de CPU/RAM/processos/tempo. Também falta executar o evaluator isolado, validar o gateway contra um provider real ou cassette aprovado e executar os ataques de sandbox que só podem ser realizados em ambiente apropriado.
 
 Os contratos atuais são deliberadamente não executores: não fazem chamadas de rede, não iniciam containers e não executam código de candidato. A presença desses módulos não constitui prova de segurança. A ausência de falhas observadas significa somente que os testes executados no ambiente atual não demonstraram a vulnerabilidade correspondente.
