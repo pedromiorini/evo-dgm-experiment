@@ -16,6 +16,7 @@ Projeto experimental inspirado na Darwin Gödel Machine para investigar, sob pro
 - [Decisões humanas registradas](protocol/DECISOES_HUMANAS.md)
 - [Arquitetura e fronteiras de confiança](protocol/ARQUITETURA.md)
 - [Pacote de decisão de infraestrutura](docs/INFRASTRUCTURE_DECISION.md)
+- [Comparação técnica de boundaries](docs/INFRASTRUCTURE_COMPARISON.md)
 - [Matriz de ameaças, propriedades e evidências](docs/THREAT_PROPERTY_MATRIX.md)
 
 ## Controles e preparação implementados

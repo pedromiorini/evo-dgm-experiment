@@ -20,6 +20,8 @@ Docker instalado não equivale a Docker acessível, e Docker acessível não equ
 
 A tabela não é um ranking. Ela registra hipóteses de boundary que precisam ser configuradas e demonstradas no ambiente de execução escolhido.
 
+A comparação factual detalhada, também sem ranking ou seleção, está em [INFRASTRUCTURE_COMPARISON.md](INFRASTRUCTURE_COMPARISON.md).
+
 | Alternativa | Ameaças que pode mitigar | Propriedades potenciais | Limitações/riscos a verificar | Impacto operacional e custo | Evidência mínima para aprovação |
 |---|---|---|---|---|---|
 | Docker rootless | Reduz impacto de daemon/containers rootful e escalada para host | Não-root efetivo, isolamento de namespaces, limites, rede negada, caps drop | Não elimina bugs de kernel, fuga de namespace, mounts indevidos ou vazamento lógico; compatibilidade de volumes/cgroups | Pode exigir instalação e daemon por usuário; mudanças em throughput, cgroups e operação | `docker info` rootless, UID/userns dentro do container, probe completo, 13 ataques, fingerprint e revisão de mounts |
