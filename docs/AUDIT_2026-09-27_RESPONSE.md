@@ -41,3 +41,9 @@ Foi adicionado `SentinelRegistry`, que mantém segredo aleatório no domínio ke
 ## Contrato estruturado dos probes
 
 Cada `AttackProbe` agora declara `expected_safe_status`, `classification_rule` e `evidence_type`. O probe de exaustão declara `FAILED_CLOSED` como resultado seguro; os checks de existência permanecem marcados como preliminares, sem serem promovidos a evidência final. A próxima etapa continua sendo sentinels físicos e observação independente.
+
+## Workspace físico de sentinels
+
+Foi adicionado `SentinelWorkspace`, que cria diretório temporário fora do projeto (`0700`) e arquivos sentinel protegidos (`0600`), com limpeza determinística. O sentinel não é montado nem copiado para o container avaliado. Testes verificam permissões, digest e remoção após o context manager.
+
+Isso prepara a medição de acesso efetivo, mas ainda não constitui evidência operacional: a próxima etapa precisa executar uma ação adversarial no runtime aprovado, observar o acesso fora de stdout declarativo e registrar o resultado na matriz. O gate continua fechado.
