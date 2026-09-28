@@ -46,3 +46,19 @@ A F1 está resolvida para `MODE=EXPLORATORY`, com a ressalva operacional de isol
 A afirmação acima sobre `docker: command not found` descrevia a verificação de 2026-09-23 e não é mais o estado atual. Na rechecagem atual, Docker `29.1.3` está instalado e o serviço está ativo, mas a sessão `ubuntu` não tem acesso ao socket. A inspeção somente-leitura privilegiada observou daemon rootful, sem `rootless` ou `userns`. Portanto o Item 8 permanece `PENDING_ISOLATION`, nenhuma alternativa foi escolhida, nenhuma configuração global foi alterada e a execução continua `FAIL_CLOSED`.
 
 A decisão humana pendente agora inclui escolher e auditar uma boundary entre Docker rootless, Docker com userns-remap, gVisor, Kata Containers, Firecracker/VM dedicada ou alternativa equivalente, conforme [INFRASTRUCTURE_DECISION.md](../docs/INFRASTRUCTURE_DECISION.md). O objetivo não é fazer um booleano passar, mas demonstrar as propriedades exigidas pelo protocolo.
+
+## Decisão arquitetural — separação de ambientes — 2026-09-28
+
+**Decisão:** o sandbox atual é classificado como `DEVELOPMENT / PREPARATION ENVIRONMENT`, não como runtime autorizado para execução de genomas.
+
+Permitido neste ambiente: editar código, executar testes unitários, validar contratos, produzir documentação, análise estática, preparar manifestos e testar readiness gates simulados. Não permitido: transformar o container de desenvolvimento em sandbox experimental por nesting, conceder acesso ao socket Docker, alterar daemon/host/sysctls/namespaces, instalar runtimes de isolamento ou executar containers de workload, candidatos, hidden tests ou os 13 ataques.
+
+O runtime experimental futuro deverá ser externo ou dedicado ao desenvolvimento e deverá manter kernel evaluator, holdout/hidden tests, seleção, orçamento, gateway, credenciais, logs confiáveis, manifesto/protocolo e controle de autorização fora do domínio do candidato. A escolha da boundary e o provisionamento desse runtime permanecem decisões humanas pendentes.
+
+O estado obrigatório permanece:
+
+```text
+FAIL_CLOSED
+genome_execution=BLOCKED
+attack_gate=CLOSED
+```

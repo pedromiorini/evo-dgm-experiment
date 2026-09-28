@@ -42,3 +42,9 @@ A chamada LLM deve manter separação estrutural entre `SYSTEM_POLICY`, `CURRENT
 ## Falha fechada
 
 A execução deve ser bloqueada quando não for possível verificar isolamento, integridade do kernel, evaluator, holdout, orçamento, gateway, proveniência ou contexto histórico. Containerização não deve ser descrita como prova absoluta de isolamento.
+
+## Separação entre desenvolvimento e runtime experimental
+
+O sandbox que hospeda o desenvolvimento do projeto é classificado como `DEVELOPMENT / PREPARATION ENVIRONMENT`. Ele pode editar código, executar testes unitários, validar contratos, produzir documentação e testar gates simulados, mas não é runtime autorizado para candidatos não confiáveis. O fato de ele próprio estar containerizado não constitui uma boundary experimental disponível para nesting.
+
+O runtime experimental futuro deverá ser externo ou dedicado e manter kernel evaluator, holdout/hidden tests, gateway, orçamento, seleção, credenciais, logs confiáveis, manifesto e controle de autorização fora do domínio do candidato. A execução somente poderá avançar após fingerprint, preflight, evidência comportamental dos 13 ataques e demonstração separada das boundaries de segurança e evaluator.
