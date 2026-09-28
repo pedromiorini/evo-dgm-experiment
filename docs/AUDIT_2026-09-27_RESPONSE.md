@@ -53,3 +53,9 @@ Isso prepara a medição de acesso efetivo, mas ainda não constitui evidência 
 Foi adicionado `run_sentinel_access_probe`. O executor monta somente o arquivo sentinel declarado, em modo read-only, no destino controlado. O leitor definido pelo kernel retorna o digest SHA-256 do conteúdo; somente o nonce exato produz `DETECTED`. Saída ausente, `BLOCKED`, stderr, linhas extras, erro ou timeout permanecem `UNVERIFIED`, pois não provam bloqueio.
 
 A integração está coberta por testes com executor controlado e não foi usada para abrir o gate: ainda depende de Docker aprovado (`rootless_or_userns` continua pendente) e de uma execução real auditada.
+
+## Rechecagem operacional de 2026-09-28
+
+Neste sandbox, `docker` está instalado (`29.1.3`) e o serviço está ativo, mas `ubuntu` não pertence ao grupo `docker`; o acesso sem privilégio ao socket retorna `permission denied`. A inspeção somente-leitura com `sudo docker info` mostrou `SecurityOptions=[seccomp,cgroupns]`, sem `rootless` ou `userns`, e driver `overlayfs`. O mapa de UID do processo também é identidade direta (`0 -> 0`), não user namespace.
+
+Consequentemente, o preflight atual retorna `FAIL_CLOSED` por indisponibilidade do socket para o processo e ainda não é possível executar o probe que confirmaria as dez propriedades. Mesmo que o acesso ao socket fosse concedido, a ausência de rootless/userns continuaria bloqueando a aprovação. Nenhuma configuração global foi alterada e nenhum container foi executado.
