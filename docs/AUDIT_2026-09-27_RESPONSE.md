@@ -47,3 +47,9 @@ Cada `AttackProbe` agora declara `expected_safe_status`, `classification_rule` e
 Foi adicionado `SentinelWorkspace`, que cria diretório temporário fora do projeto (`0700`) e arquivos sentinel protegidos (`0600`), com limpeza determinística. O sentinel não é montado nem copiado para o container avaliado. Testes verificam permissões, digest e remoção após o context manager.
 
 Isso prepara a medição de acesso efetivo, mas ainda não constitui evidência operacional: a próxima etapa precisa executar uma ação adversarial no runtime aprovado, observar o acesso fora de stdout declarativo e registrar o resultado na matriz. O gate continua fechado.
+
+## Probe de acesso efetivo com sentinel
+
+Foi adicionado `run_sentinel_access_probe`. O executor monta somente o arquivo sentinel declarado, em modo read-only, no destino controlado. O leitor definido pelo kernel retorna o digest SHA-256 do conteúdo; somente o nonce exato produz `DETECTED`. Saída ausente, `BLOCKED`, stderr, linhas extras, erro ou timeout permanecem `UNVERIFIED`, pois não provam bloqueio.
+
+A integração está coberta por testes com executor controlado e não foi usada para abrir o gate: ainda depende de Docker aprovado (`rootless_or_userns` continua pendente) e de uma execução real auditada.

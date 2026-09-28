@@ -259,7 +259,10 @@ print(json.dumps(result, sort_keys=True))'''
             raise DockerExecutorError("runtime não comprovou todos os invariantes: FAIL_CLOSED")
         return evidence
 
-    def run(self, argv: Sequence[str], *, stdin_data: str = "") -> DockerRunResult:
+    def run(
+        self, argv: Sequence[str], *, stdin_data: str = "",
+        mounts: tuple[tuple[str, str], ...] = (),
+    ) -> DockerRunResult:
         if not argv or any("\x00" in arg for arg in argv):
             raise DockerExecutorError("comando vazio ou inválido")
         evidence = self._evidence
@@ -277,6 +280,6 @@ print(json.dumps(result, sort_keys=True))'''
         docker = self._which("docker")
         if not docker:
             raise DockerExecutorError("Docker indisponível: FAIL_CLOSED")
-        command = (docker, *self.profile.command_args(), *argv)
+        command = (docker, *self.profile.command_args(mounts=mounts), *argv)
         code, stdout, stderr = self._runner(command, self._timeout, stdin_data)
         return DockerRunResult(code, stdout, stderr)

@@ -32,6 +32,7 @@ from .sandbox import (
 )
 from .sentinels import Sentinel, SentinelError, SentinelObservation, SentinelRegistry
 from .sentinel_workspace import SentinelWorkspace
+from .sentinel_probe import SentinelProbeResult, run_sentinel_access_probe
 from .task_validation import TaskDefinition, TaskValidationError, TaskValidationResult
 from .validity import CandidateValidity, PromotionDenied, ValidityState
 
@@ -51,6 +52,7 @@ __all__ = [
     "LineageRecord", "ProvenanceError", "ReadinessReport", "RuntimeReadiness", "default_runtime_probes",
     "IsolationStatus", "SandboxEnvError", "SandboxUnavailable", "build_minimal_env", "make_isolated_workdir",
     "require_isolation", "verify_docker_isolation", "Sentinel", "SentinelError", "SentinelObservation",
-    "SentinelRegistry", "SentinelWorkspace", "TaskDefinition", "TaskValidationError", "TaskValidationResult",
+    "SentinelRegistry", "SentinelWorkspace", "SentinelProbeResult", "run_sentinel_access_probe",
+    "TaskDefinition", "TaskValidationError", "TaskValidationResult",
     "CandidateValidity", "PromotionDenied", "ValidityState",
 ]
