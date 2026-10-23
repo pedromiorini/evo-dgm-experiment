@@ -1,0 +1,48 @@
+name: CI
+
+"on":
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install development dependencies
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: |
+          set -euo pipefail
+          # ubuntu-latest inclui o CLI Docker. validate/inspect/preflight
+          # chamam esse CLI se ele estiver no PATH; preflight chega a
+          # `docker run` quando `docker info` responde. Este job executa
+          # apenas a suíte unitária local: sem socket, sem container de
+          # workload e sem execução de genoma (FAIL_CLOSED).
+          while command -v docker >/dev/null 2>&1; do
+            sudo rm -f "$(command -v docker)"
+          done
+          if command -v docker >/dev/null 2>&1; then
+            echo "CLI docker ainda está no PATH; abortando antes do pytest." >&2
+            exit 1
+          fi
+          PYTHONPATH=src python3 -m pytest
